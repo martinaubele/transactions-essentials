@@ -83,6 +83,10 @@ public class ParticipantAdapter implements Participant {
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.logDebug("Calling prepare on " + getURI());
 		}
+		// happens for recursive calls
+		if (cascadeList.isEmpty()) {
+			return Participant.READ_ONLY;
+		}
 		try {
 			int result = client.target(uri).request()
 					.buildPost(Entity.entity(cascadeList, HeaderNames.MimeType.APPLICATION_VND_ATOMIKOS_JSON))
