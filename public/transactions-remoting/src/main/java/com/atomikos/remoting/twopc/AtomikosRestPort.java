@@ -188,18 +188,21 @@ public class AtomikosRestPort {
 		        }
 		    }
 		} else { //abandoned in OLTP? => delegate to log and recovery
-	
-                if (!onePhase) {
-                    try {
-                        delegateToRecovery(coordinatorId, true);
-                    } catch (LogException e) {
-                        LOGGER.logWarning("Error in commit for root " + rootId, e);
-                        throw409(e);
-                    }
-                } else {
-                    Response response = Response.status(Status.CONFLICT).entity(rootId).type(MediaType.TEXT_PLAIN).build();
-                    throw new WebApplicationException(response);
-                }
+			// commit is called twice if call to commit is done transitive a -> b -> c and a -> c
+			// during commit the participant is removed from the TransactionService
+			// so for the second call we would get a 409
+			
+            //    if (!onePhase) {
+			//        try {
+			//            delegateToRecovery(coordinatorId, true);
+			//        } catch (LogException e) {
+			//            LOGGER.logWarning("Error in commit for root " + rootId, e);
+			//            throw409(e);
+			//        }
+            //    } else {
+            //        Response response = Response.status(Status.CONFLICT).entity(rootId).type(MediaType.TEXT_PLAIN).build();
+            //        throw new WebApplicationException(response);
+            //    }
 
 		}
 		
